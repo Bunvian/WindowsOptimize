@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Tối ưu Windows</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #101a24 0%, #0f2027 60%, #212f3c 100%);
+            --matrix-green: #00ffae;
+            --matrix-glow: #00e7c3;
+            --card-bg: rgba(15, 23, 34, 0.77);
+            --card-border: #00ffae44;
+            --accent: #00ffd0;
+            --logo-shadow: 0 0 24px #00ffae88;
+            --modal-bg: rgba(15,23,34,0.86);
+        }
+        body {
+            margin: 0;
+            font-family: 'Roboto Mono', 'Montserrat', monospace;
+            background: var(--bg-gradient);
+            color: #eafefc;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        #matrix {
+            position: fixed;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.27;
+            mix-blend-mode: lighten;
+        }
+        .header {
+            z-index: 2;
+            position: sticky;
+            top: 0;
+            padding: 0 30px;
+            height: 80px;
+            background: rgba(10,23,34,0.96);
+            border-bottom: 2px solid #00ffd0;
+            box-shadow: 0 8px 32px #00ffd022;
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            margin-right: 18px;
+            box-shadow: var(--logo-shadow);
+            object-fit: cover;
+            background: #111;
+        }
+        .header-title {
+            font-family: 'Montserrat', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 0.09em;
+            color: var(--matrix-green);
+            text-shadow: 0 2px 32px #00ffd044, 0 1px 0 #111;
+        }
+        .header-contact {
+            margin-left: auto;
+            text-align: right;
+            font-size: 1.06em;
+        }
+        .header-contact span {
+            color: var(--matrix-green);
+            font-weight: 900;
+        }
+        .header-contact small {
+            color: #7ef7d3;
+            font-size: 0.98em;
+        }
+        .typewriter {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 14px;
+            letter-spacing: 0.04em;
+            text-shadow: 0 2px 18px #00ffd033;
+            text-align: center;
+        }
+        .nav-section {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 26px;
+            z-index: 3;
+        }
+        .nav-btn {
+            background: none;
+            border: 2px solid var(--matrix-green);
+            color: var(--matrix-green);
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 1.05em;
+            padding: 11px 28px;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: background .2s, color .2s, border-color .2s;
+        }
+        .nav-btn.active, .nav-btn:hover {
+            background: var(--matrix-green);
+            color: #101a24;
+            border-color: #00ffd0;
+        }
+        .container {
+            max-width: 980px;
+            margin: 40px auto 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .section {display:none;animation:fadeIn .5s;}
+        .section.active {display:block;}
+        @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+        /* Card hacker style */
+        .card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            box-shadow: 0 8px 40px #00ffd044;
+            padding: 28px 22px;
+            margin-bottom: 36px;
+            border: 2px solid var(--card-border);
+            transition: background .13s, box-shadow .2s, transform .14s, border .1s;
+            position: relative;
+        }
+        .card:hover {
+            background: rgba(16, 26, 36, 0.88);
+            border-color: #00ffd0;
+            box-shadow: 0 16px 64px #00ffd066;
+            transform: scale(1.02) translateY(-4px);
+        }
+        .card-title {
+            font-family: 'Montserrat', monospace;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--matrix-green);
+            letter-spacing: .05em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 16px #00ffd033;
+        }
+        .card-desc {
+            color: #bafee9;
+            font-size: 1.06em;
+            margin-bottom: 14px;
+            font-weight: 500;
+        }
+        .card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+        }
+        .action-btn {
+            background: var(--matrix-glow);
+            color: #101a24;
+            font-family: 'Roboto Mono', monospace;
+            border: none;
+            padding: 11px 22px;
+            border-radius: 9px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px #00ffd033;
+            cursor: pointer;
+            transition: background .13s, color .13s, box-shadow .1s;
+        }
+        .action-btn:hover {
+            background: #101a24;
+            color: var(--matrix-green);
+            box-shadow: 0 2px 18px #00ffd055;
+        }
+        /* System stats */
+        .system-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .stat {
+            background: rgba(8, 20, 31, 0.66);
+            border-radius: 11px;
+            padding: 16px 18px;
+            min-width: 120px;
+            text-align: center;
+            box-shadow: 0 2px 18px #00ffd022;
+            border: 1.5px solid #00ffd044;
+        }
+        .stat-value {
+            font-size: 1.23em;
+            font-weight: 900;
+            color: var(--accent);
+            text-shadow: 0 2px 16px #00ffd066;
+        }
+        .stat-label {
+            color: #bafee9;
+            font-size: 1em;
+            font-weight: 500;
+        }
+        .monitor-grid {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        .monitor-item {
+            background: rgba(8, 20, 31, 0.58);
+            border-radius: 10px;
+            padding: 12px 18px;
+            min-width: 100px;
+            text-align: center;
+            box-shadow: 0 2px 12px #00ffd033;
+            border: 1.5px solid #00ffd044;
+        }
+        .monitor-value {
+            font-size: 1.13em;
+            font-weight: 700;
+            color: var(--matrix-green);
+        }
+        .monitor-label {
+            color: #bafee9;
+            font-weight: 500;
+        }
+        /* Step cards */
+        .steps-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            margin-top: 8px;
+        }
+        .step-card {
+            background: rgba(8, 20, 31, 0.56);
+            border-radius: 13px;
+            border: 1.5px solid #00ffd044;
+            box-shadow: 0 6px 26px #00ffd022;
+            padding: 22px 18px;
+            transition: background .12s, box-shadow .13s, transform .11s, border .1s;
+            position: relative;
+        }
+        .step-card:hover {
+            background: rgba(19, 28, 39, 0.69);
+            border-color: #00ffd0;
+            box-shadow: 0 10px 40px #00ffd044;
+            transform: scale(1.017) translateY(-2px);
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--matrix-green);
+            color: #101a24;
+            border-radius: 50%;
+            font-weight: 900;
+            font-size: 1.07em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+            font-family: 'Montserrat', monospace;
+        }
+        .step-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: var(--matrix-green);
+            font-family: 'Montserrat', monospace;
+        }
+        .step-description {
+            color: #bafee9;
+            font-size: 0.99em;
+            margin-bottom: 7px;
+        }
+        .step-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .action-item {
+            background: #101a24;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 0.95em;
+            padding: 10px 15px;
+            margin: 2px 0;
+            font-weight: 700;
+            box-shadow: 0 2px 10px #00ffd022;
+            transition: background .12s, color .12s;
+            cursor: pointer;
+            border: 1.5px solid #00ffd044;
+        }
+        .action-item:hover {
+            background: var(--matrix-green);
+            color: #101a24;
+        }
+        .code-block {
+            background: rgba(8, 20, 31, 0.66);
+            border: 1.5px solid #00ffd044;
+            color: #00ffd0;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.97em;
+            margin: 4px 0;
+            position: relative;
+            cursor: pointer;
+            transition: background .12s;
+        }
+        .code-block:hover {
+            background: #00ffd022;
+            color: #101a24;
+        }
+        .code-block::after {
+            content: 'COPY';
+            position: absolute;
+            top: 8px; right: 15px;
+            background: var(--accent);
+            color: #101a24;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 900;
+            cursor: pointer;
+            transition: background .12s;
+        }
+        .dns-config {
+            background: rgba(16,26,36,0.46);
+            border: 1.5px solid #00ffd044;
+            padding: 10px 13px;
+            border-radius: 8px;
+            margin: 7px 0;
+        }
+        .dns-config h5 {
+            color: var(--matrix-green);
+            margin-bottom: 7px;
+            font-weight: 700;
+            font-size: 1em;
+        }
+        .dns-item {
+            font-family: 'Roboto Mono', monospace;
+            color: #fff;
+            margin: 5px 0;
+            padding: 5px 10px;
+            background: #212f3c;
+            border-radius: 6px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: background .12s, color .12s;
+        }
+        .dns-item:hover {
+            background: var(--matrix-green);
+            color: #101a24;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(10,23,34,0.44);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-download {
+            background: var(--modal-bg);
+            border-radius: 18px;
+            border: 2px solid var(--card-border);
+            box-shadow: 0 8px 40px #00ffd044;
+            min-width: 330px;
+            max-width: 92vw;
+            padding: 32px 26px 24px 26px;
+            text-align: center;
+            position: relative;
+            animation: fadeIn .35s;
+        }
+        .modal-download-title {
+            color: var(--matrix-green);
+            font-size: 1.18rem;
+            font-family: 'Montserrat', monospace;
+            font-weight: 900;
+            margin-bottom: 18px;
+        }
+        .modal-download-desc {
+            color: #bafee9;
+            font-size: 1em;
+            margin-bottom: 18px;
+        }
+        .modal-download-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+        }
+        .download-btn {
+            position: relative;
+            background: var(--matrix-glow);
+            color: #101a24;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px #00ffd033;
+            font-size: 1.07em;
+            padding: 13px 34px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: background .13s, color .13s;
+            outline: none;
+        }
+        .download-btn .wave {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, #00ffd0 10%, #00ffae 90%);
+            opacity: 0.9;
+            transform: translateX(-100%);
+            transition: transform .45s cubic-bezier(.42,.84,.19,.98);
+            z-index: 1;
+        }
+        .download-btn.wave-active .wave {
+            transform: translateX(0);
+            transition: transform .45s cubic-bezier(.42,.84,.19,.98);
+        }
+        .download-btn span {
+            position: relative;
+            z-index: 2;
+        }
+        .download-btn.wave-active span {
+            color: #101a24;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: none;
+            color: var(--accent);
+            font-size: 1.4em;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 900;
+            padding: 2px 6px 0 6px;
+            transition: color .15s;
+            z-index: 99;
+        }
+        .modal-close-btn:hover {
+            color: #fff;
+        }
+        @media (max-width:600px) {
+            .header {height: 56px;}
+            .logo-img {width:30px;height:30px;}
+            .header-title {font-size:1.2em;}
+            .container {padding:0 7px;}
+            .card,.step-card {padding:12px;}
+            .modal-download {padding:13px 8px;}
+            .modal-download-title {font-size:1em;}
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <div class="header">
+        <img class="logo-img" id="logoImg" src="https://i.postimg.cc/G382q0gY/logo.png" alt="logo">
+        <div class="header-title">Windows Optimize</div>
+        <div class="header-contact">
+            <span>Tuấn Anh</span><br>
+            <small>Liên hệ: 0368 229 185</small>
+        </div>
+    </div>
+    <div class="container">
+        <div class="typewriter" id="typewriter"></div>
+        <div class="nav-section">
+            <button class="nav-btn active" id="btn-system" onclick="showSection(0)">Hệ thống</button>
+            <button class="nav-btn" id="btn-steps" onclick="showSection(1)">Các bước tối ưu</button>
+        </div>
+        <div class="section active" id="section-system">
+            <div class="card">
+                <div class="card-title">Thông tin hệ thống</div>
+                <div class="card-desc">Theo dõi trạng thái máy của bạn</div>
+                <div class="system-stats">
+                    <div class="stat"><div class="stat-value" id="cpuUsage">--</div><div class="stat-label">CPU</div></div>
+                    <div class="stat"><div class="stat-value" id="ramUsage">--</div><div class="stat-label">RAM</div></div>
+                    <div class="stat"><div class="stat-value" id="diskUsage">--</div><div class="stat-label">Disk</div></div>
+                    <div class="stat"><div class="stat-value" id="systemScore">--</div><div class="stat-label">Score</div></div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Chức năng nhanh</div>
+                <div class="card-actions">
+                    <button class="action-btn" onclick="runSystemScan()">Quét hệ thống</button>
+                    <button class="action-btn" onclick="quickOptimize()">Tối ưu nhanh</button>
+                    <button class="action-btn" onclick="generateReport()">Báo cáo</button>
+                    <button class="action-btn" onclick="autoOptimize()">AI Optimize</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Hiệu năng thực tế</div>
+                <div class="monitor-grid">
+                    <div class="monitor-item"><div class="monitor-value" id="bootTime">--s</div><div class="monitor-label">Boot time</div></div>
+                    <div class="monitor-item"><div class="monitor-value" id="processes">--</div><div class="monitor-label">Processes</div></div>
+                    <div class="monitor-item"><div class="monitor-value" id="services">--</div><div class="monitor-label">Services</div></div>
+                    <div class="monitor-item"><div class="monitor-value" id="temperature">--°C</div><div class="monitor-label">CPU Temp</div></div>
+                </div>
+            </div>
+        </div>
+        <div class="section" id="section-steps">
+            <div class="card">
+                <div class="card-title">Các bước tối ưu hóa</div>
+                <div class="steps-grid">
+                    <!-- Các bước giữ nguyên như cũ -->
+                    <div class="step-card" onclick="toggleStep(1)">
+                        <div class="step-header"><div class="step-number">1</div><div class="step-title">Cập nhật Windows</div></div>
+                        <div class="step-description">Đảm bảo hệ thống được cập nhật với các bản vá lỗi và driver mới nhất để tối ưu hiệu suất và bảo mật.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="openSettings('update');event.stopPropagation();">Settings → Update & Security → Windows Update</div>
+                            <div class="action-item" onclick="checkUpdates();event.stopPropagation();">Nhấn "Check for updates"</div>
+                            <div class="action-item">Cập nhật các bản vá, driver quan trọng</div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(2)">
+                        <div class="step-header"><div class="step-number">2</div><div class="step-title">Cài đặt Driver</div></div>
+                        <div class="step-description">Kiểm tra và cài đặt các driver thiếu để đảm bảo phần cứng hoạt động tối ưu.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="openDeviceManager();event.stopPropagation();">Mở Device Manager để kiểm tra driver thiếu</div>
+                            <div class="action-item" onclick="scanDrivers();event.stopPropagation();">Tải driver từ trang web chính thức</div>
+                            <div class="action-item">Dell, HP, Asus, MSI, Lenovo...</div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(3)">
+                        <div class="step-header"><div class="step-number">3</div><div class="step-title">Xóa ứng dụng rác</div></div>
+                        <div class="step-description">Loại bỏ ứng dụng không cần thiết để giải phóng dung lượng và tăng hiệu suất hệ thống.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="openAppsSettings();event.stopPropagation();">Settings → Apps → Apps & features</div>
+                            <div class="action-item" onclick="scanBloatware();event.stopPropagation();">Quét và xóa bloatware tự động</div>
+                            <div class="action-item">Xóa những app rác không sử dụng</div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(4)">
+                        <div class="step-header"><div class="step-number">4</div><div class="step-title">Tinh chỉnh với Winutil</div></div>
+                        <div class="step-description">Sử dụng Winutil để tối ưu hóa Windows chuyên nghiệp với các tweaks nâng cao.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="openPowerShell();event.stopPropagation();">Win + X → PowerShell (Admin)</div>
+                            <div class="code-block" onclick="copyToClipboard('irm &quot;https://christitus.com/win&quot; | iex');event.stopPropagation();">irm "https://christitus.com/win" | iex</div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(5)">
+                        <div class="step-header"><div class="step-number">5</div><div class="step-title">Bật High Performance</div></div>
+                        <div class="step-description">Kích hoạt chế độ hiệu suất cao để tối ưu hóa CPU và hệ thống.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="enableHighPerformance();event.stopPropagation();">Kích hoạt Ultimate Performance Mode</div>
+                            <div class="code-block" onclick="copyToClipboard('powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61');event.stopPropagation();">powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61</div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(6)">
+                        <div class="step-header"><div class="step-number">6</div><div class="step-title">Cấu hình DNS</div></div>
+                        <div class="step-description">Thiết lập DNS Google để tăng tốc độ truy cập và ổn định kết nối.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="configureDNS();event.stopPropagation();">Cấu hình WiFi/Ethernet Adapters</div>
+                            <div class="dns-config">
+                                <h5>IPv4 DNS:</h5>
+                                <div class="dns-item" onclick="copyToClipboard('8.8.8.8');event.stopPropagation();">Primary: 8.8.8.8</div>
+                                <div class="dns-item" onclick="copyToClipboard('8.8.4.4');event.stopPropagation();">Secondary: 8.8.4.4</div>
+                                <h5>IPv6 DNS:</h5>
+                                <div class="dns-item" onclick="copyToClipboard('2001:4860:4860::8888');event.stopPropagation();">Primary: 2001:4860:4860::8888</div>
+                                <div class="dns-item" onclick="copyToClipboard('2001:4860:4860::8844');event.stopPropagation();">Secondary: 2001:4860:4860::8844</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(7)">
+                        <div class="step-header"><div class="step-number">7</div><div class="step-title">Tắt tính năng không cần thiết</div></div>
+                        <div class="step-description">Vô hiệu hóa các tính năng ảnh hưởng đến hiệu suất gaming và làm việc.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="disableGameMode();event.stopPropagation();">Tắt Game Mode và Xbox Services</div>
+                            <div class="action-item" onclick="disableBackgroundApps();event.stopPropagation();">Tắt Background Apps</div>
+                            <div class="action-item" onclick="manageStartup();event.stopPropagation();">Quản lý Startup Programs</div>
+                        </div>
+                    </div>
+                    <!-- Step 8 - MODAL -->
+                    <div class="step-card" onclick="toggleStep(8)">
+                        <div class="step-header"><div class="step-number">8</div><div class="step-title">Cài đặt ứng dụng cần thiết</div></div>
+                        <div class="step-description">Cài đặt các ứng dụng và runtime cần thiết cho hệ thống hoạt động ổn định.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="installEssentials();event.stopPropagation();">WinRAR, 7-Zip</div>
+                            <div class="action-item" onclick="installRuntimes();event.stopPropagation();">Visual C++ Redistributables</div>
+                            <div class="action-item">.NET Desktop Runtime</div>
+                            <div class="action-item">Microsoft Office</div>
+                        </div>
+                    </div>
+                    <div class="step-card" onclick="toggleStep(9)">
+                        <div class="step-header"><div class="step-number">9</div><div class="step-title">Tối ưu Visual Effects</div></div>
+                        <div class="step-description">Điều chỉnh hiệu ứng hình ảnh để tối ưu hóa hiệu suất với sự cân bằng giữa đẹp mắt và tốc độ.</div>
+                        <div class="step-actions">
+                            <div class="action-item" onclick="openPerformanceOptions();event.stopPropagation();">Search → Adjust the appearance and performance of Windows</div>
+                            <div class="action-item" onclick="optimizeVisualEffects();event.stopPropagation();">Adjust for best performance</div>
+                            <div class="action-item">Tùy chỉnh theo nhu cầu cá nhân</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- MODAL DOWNLOAD -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-download" id="modalDownload">
+            <button class="modal-close-btn" onclick="closeModal()" title="Đóng">&times;</button>
+            <div class="modal-download-title">Cài đặt ứng dụng cần thiết</div>
+            <div class="modal-download-desc">Click vào nút bên dưới để tải về các phần mềm hoặc liên hệ để cài Office.</div>
+            <div class="modal-download-btns">
+                <button class="download-btn" id="btnWinrar" onclick="downloadWave(this, 'https://www.win-rar.com/download.html')">
+                    <span>Tải WinRAR</span>
+                    <div class="wave"></div>
+                </button>
+                <button class="download-btn" id="btn7zip" onclick="downloadWave(this, 'https://www.7-zip.org/')">
+                    <span>Tải 7-Zip</span>
+                    <div class="wave"></div>
+                </button>
+                <button class="download-btn" id="btnVCpp" onclick="downloadWave(this, 'https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/')">
+                    <span>Tải Visual C++ Redistributable</span>
+                    <div class="wave"></div>
+                </button>
+                <button class="download-btn" id="btnDotnet" onclick="downloadWave(this, 'https://dotnet.microsoft.com/en-us/download')">
+                    <span>Tải .NET Desktop Runtime</span>
+                    <div class="wave"></div>
+                </button>
+                <button class="download-btn" id="btnOffice" onclick="officeContact(this)">
+                    <span>Liên hệ để cài Office</span>
+                    <div class="wave"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Matrix rain hacker effect
+        let canvas = document.getElementById("matrix"),
+            ctx = canvas.getContext("2d"),
+            w = window.innerWidth,
+            h = window.innerHeight,
+            symbols = "アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチッヂヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲンabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(){}[]<>",
+            fontSize = 18,
+            columns = Math.floor(w / fontSize),
+            drops = [];
+        function resizeMatrix(){
+            w = window.innerWidth;
+            h = window.innerHeight;
+            canvas.width = w;
+            canvas.height = h;
+            columns = Math.floor(w / fontSize);
+            drops = [];
+            for(let x=0;x<columns;x++) drops[x]=Math.random()*h/fontSize;
+        }
+        resizeMatrix();
+        window.addEventListener('resize',resizeMatrix);
+        function drawMatrix(){
+            ctx.fillStyle = "rgba(16,26,36,0.7)";
+            ctx.fillRect(0,0,w,h);
+            ctx.font = fontSize+"px 'Roboto Mono',monospace";
+            for(let i=0;i<columns;i++){
+                let text = symbols[Math.floor(Math.random()*symbols.length)];
+                ctx.fillStyle = i%2==0 ? "#00ffd0" : "#00ffae";
+                ctx.shadowColor = "#00ffd0";
+                ctx.shadowBlur = 8;
+                ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+                ctx.shadowBlur = 0;
+                drops[i]++;
+                if(drops[i]*fontSize > h && Math.random()>0.985) drops[i]=0;
+            }
+        }
+        setInterval(drawMatrix, 48);
+
+        const typewriterText = "Tôi bị ngu và bạn cũng thế 🤡!";
+        let typeIdx = 0;
+        function typeWriter() {
+            const tw = document.getElementById('typewriter');
+            if (typeIdx <= typewriterText.length) {
+                tw.textContent = typewriterText.slice(0, typeIdx);
+                typeIdx++;
+                setTimeout(typeWriter, 44);
+            }
+        }
+        typeWriter();
+
+        function showSection(idx) {
+            document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',i===idx));
+            document.querySelectorAll('.section').forEach((s,i)=>s.classList.toggle('active',i===idx));
+        }
+
+        function updateSystemStats() {
+            document.getElementById('cpuUsage').textContent = Math.floor(Math.random() * 30 + 20) + '%';
+            document.getElementById('ramUsage').textContent = Math.floor(Math.random() * 40 + 40) + '%';
+            document.getElementById('diskUsage').textContent = Math.floor(Math.random() * 20 + 60) + '%';
+            document.getElementById('systemScore').textContent = Math.floor(Math.random() * 20 + 80);
+            document.getElementById('bootTime').textContent = Math.floor(Math.random() * 10 + 15) + 's';
+            document.getElementById('processes').textContent = Math.floor(Math.random() * 50 + 150);
+            document.getElementById('services').textContent = Math.floor(Math.random() * 20 + 80);
+            document.getElementById('temperature').textContent = Math.floor(Math.random() * 15 + 45) + '°C';
+        }
+        setTimeout(updateSystemStats,500);
+        setInterval(updateSystemStats, 5000);
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 18px; right: 18px;
+                background: var(--matrix-green);
+                color: #101a24; padding: 13px 22px;
+                border-radius: 10px; font-weight: 700;
+                z-index: 10000; font-size:1.07em;
+                box-shadow: 0 4px 18px #00ffd088;
+                animation: fadeIn .3s;
+                font-family: 'Roboto Mono',monospace;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 2300);
+        }
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => showNotification('📋 Đã copy vào clipboard!'));
+        }
+        function runSystemScan() { showNotification('🔍 Đang quét hệ thống...'); simulateLoading('Quét hoàn thành! Tìm thấy 15 vấn đề cần tối ưu.'); }
+        function quickOptimize() { showNotification('⚡ Đang tối ưu nhanh...'); simulateLoading('Tối ưu hoàn thành! Hiệu suất tăng 25%.'); }
+        function generateReport() { showNotification('📊 Đang tạo báo cáo...'); simulateLoading('Báo cáo đã được tạo và lưu vào Desktop.'); }
+        function autoOptimize() { showNotification('🤖 Đang chạy AI optimization...'); simulateLoading('AI đã tối ưu hoàn thành! Hệ thống chạy mượt hơn 40%.'); }
+        function simulateLoading(msg) { setTimeout(() => {showNotification(msg);updateSystemStats();}, 1500); }
+        function checkUpdates() { showNotification('✅ Đã kiểm tra updates!'); }
+        function scanDrivers() { showNotification('🔧 Đã quét drivers!'); }
+        function scanBloatware() { showNotification('🧹 Đã dọn dẹp bloatware!'); }
+        function enableHighPerformance() { showNotification('⚡ Đã bật High Performance!'); }
+        function configureDNS() { showNotification('🌐 Đã cấu hình DNS!'); }
+        function disableGameMode() { showNotification('🎮 Đã tắt Game Mode!'); }
+        function installEssentials() { showNotification('📦 Đã cài đặt ứng dụng cần thiết!'); }
+        function optimizeVisualEffects() { showNotification('🎨 Đã tối ưu Visual Effects!'); }
+        function openSettings(section) {showNotification('⚙️ Đang mở Settings...');}
+        function openDeviceManager() {showNotification('🔧 Đang mở Device Manager...');}
+        function openAppsSettings() {showNotification('📱 Đang mở Apps Settings...');}
+        function openPowerShell() {showNotification('💻 Đang mở PowerShell...');}
+        function openPerformanceOptions() {showNotification('🎭 Đang mở Performance Options...');}
+        function disableBackgroundApps() {showNotification('📱 Đã tắt Background Apps!');}
+        function manageStartup() {showNotification('🚀 Quản lý Startup Programs...');}
+        function installRuntimes() {showNotification('⚙️ Đang cài Visual C++ Redistributables...');}
+        // MODAL logic
+        function toggleStep(i) {
+            if (i === 8) {
+                document.getElementById('modalOverlay').classList.add('active');
+            }
+        }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+        // Wave effect for download
+        function downloadWave(btn, link) {
+            if (btn.classList.contains('wave-active')) return;
+            btn.classList.add('wave-active');
+            setTimeout(function(){
+                window.open(link, '_blank');
+                btn.classList.remove('wave-active');
+            }, 480);
+        }
+        function officeContact(btn) {
+            btn.classList.add('wave-active');
+            setTimeout(function(){
+                showNotification('Liên hệ Tuấn Anh: 0368 229 185 để cài Office nhé!');
+                btn.classList.remove('wave-active');
+            }, 480);
+        }
+    </script>
+</body>
+</html>
